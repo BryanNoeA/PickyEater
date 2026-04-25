@@ -1,26 +1,10 @@
 import SwiftUI
 
 enum FoodCategory: String, CaseIterable, Codable, Identifiable {
-    case italian
-    case mexican
-    case sushi
-    case chinese
-    case american
-    case thai
-    case indian
-    case mediterranean
-    case burgers
-    case pizza
-    case sandwiches
-    case salads
-    case korean
-    case vietnamese
-    case greek
-    case bbq
-    case seafood
-    case breakfast
-    case ramen
-    case tacos
+    case italian, mexican, sushi, chinese, american
+    case thai, indian, mediterranean, burgers, pizza
+    case sandwiches, salads, korean, vietnamese, greek
+    case bbq, seafood, breakfast, ramen, tacos
 
     var id: String { rawValue }
 

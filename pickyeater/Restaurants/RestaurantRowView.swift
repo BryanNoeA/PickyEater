@@ -2,12 +2,6 @@ import SwiftUI
 import MapKit
 import CoreLocation
 
-private func addressLine(for item: MKMapItem) -> String {
-    // placemark deprecated in iOS 26 but still functional; address API available in future update
-    let placemark = item.placemark
-    return placemark.thoroughfare ?? placemark.locality ?? placemark.administrativeArea ?? ""
-}
-
 struct RestaurantRowView: View {
     let mapItem: MKMapItem
     let userLocation: CLLocation
@@ -33,8 +27,7 @@ struct RestaurantRowView: View {
                         .font(.system(size: 15, weight: .semibold))
                         .foregroundStyle(.primary)
                         .lineLimit(1)
-
-                    Text(addressLine(for: mapItem))
+                    Text(addressLine)
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
@@ -55,5 +48,21 @@ struct RestaurantRowView: View {
         }
         .buttonStyle(.plain)
         .padding(.vertical, 4)
+        .accessibilityLabel("\(mapItem.name ?? "Restaurant"), \(mapItem.distanceString(from: userLocation)) away")
+        .accessibilityHint("Opens directions in Maps")
     }
+
+    private var addressLine: String {
+        mapItem.placemark.thoroughfare ?? mapItem.placemark.locality ?? mapItem.placemark.administrativeArea ?? ""
+    }
+}
+
+#Preview {
+    let item = MKMapItem(placemark: MKPlacemark(coordinate: .init(latitude: 37.7749, longitude: -122.4194)))
+    item.name = "Nobu San Francisco"
+    return RestaurantRowView(
+        mapItem: item,
+        userLocation: CLLocation(latitude: 37.7849, longitude: -122.4094)
+    )
+    .padding()
 }

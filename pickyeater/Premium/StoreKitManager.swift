@@ -14,7 +14,7 @@ final class StoreKitManager {
             let products = try await Product.products(for: [StoreKitManager.premiumProductID])
             product = products.first
         } catch {
-            // Product load failure is non-fatal; paywall will show without a price
+            // Non-fatal: paywall shows without a localized price
         }
     }
 
@@ -29,7 +29,7 @@ final class StoreKitManager {
         isPurchased = false
     }
 
-    func purchase(appState: AppState) async {
+    func purchase() async {
         guard let product else { return }
         do {
             let result = try await product.purchase()
@@ -38,8 +38,6 @@ final class StoreKitManager {
                 if case .verified(let transaction) = verification {
                     await transaction.finish()
                     isPurchased = true
-                    appState.isPremium = true
-                    appState.showPaywall = false
                 }
             case .userCancelled, .pending:
                 break
@@ -47,33 +45,27 @@ final class StoreKitManager {
                 break
             }
         } catch {
-            // Purchase errors are surfaced to the UI via isPurchased remaining false
+            // Failure surfaced via isPurchased remaining false
         }
     }
 
-    func restorePurchases(appState: AppState) async {
+    func restorePurchases() async {
         do {
             try await AppStore.sync()
             await checkPurchaseStatus()
-            if isPurchased {
-                appState.isPremium = true
-                appState.showPaywall = false
-            }
         } catch {
-            // Restore failure is non-fatal
+            // Non-fatal
         }
     }
 
-    func startTransactionListener(appState: AppState) {
+    func startTransactionListener() {
         transactionListenerTask?.cancel()
         transactionListenerTask = Task {
             for await result in Transaction.updates {
                 if case .verified(let transaction) = result {
                     await transaction.finish()
                     if transaction.productID == StoreKitManager.premiumProductID {
-                        let owned = transaction.revocationDate == nil
-                        isPurchased = owned
-                        appState.isPremium = owned
+                        isPurchased = transaction.revocationDate == nil
                     }
                 }
             }

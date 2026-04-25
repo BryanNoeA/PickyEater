@@ -28,10 +28,8 @@ extension MKMapItem {
         } else {
             coord = placemark.coordinate
         }
-        let itemLocation = CLLocation(latitude: coord.latitude, longitude: coord.longitude)
-        let meters = location.distance(from: itemLocation)
+        let meters = location.distance(from: CLLocation(latitude: coord.latitude, longitude: coord.longitude))
         let miles = meters / 1609.344
-        if miles < 0.1 { return "< 0.1 mi" }
-        return String(format: "%.1f mi", miles)
+        return miles < 0.1 ? "< 0.1 mi" : String(format: "%.1f mi", miles)
     }
 }

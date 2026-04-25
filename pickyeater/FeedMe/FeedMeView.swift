@@ -1,21 +1,12 @@
 import SwiftUI
 
 // V2 — NOT YET IMPLEMENTED
-// Architecture:
-//   FeedMeView → FeedMeViewModel (@Observable)
-//     - messages: [ChatMessage]
-//     - currentStep: FeedMeStep (mood → dietary → budget → groupSize → result)
-//     - func sendMessage() → calls AnthropicService
-//
-//   AnthropicService
-//     - Model: claude-haiku-4-5-20251001 (fast + low cost for conversational)
-//     - System prompt cached as prefix block (prompt caching ~90% cost reduction)
-//     - Structured JSON output: { restaurant: String, menuItem: String, reasoning: String }
-//     - API key: NEVER embed in app — proxy through Cloudflare Worker or Supabase Edge Function
-//     - AnthropicService(baseURL: URL) — configurable for proxy swap
+// Architecture for V2:
+//   FeedMeViewModel (@Observable) → step-by-step: mood → dietary → budget → groupSize → result
+//   AnthropicService → claude-haiku-4-5-20251001, prompt caching, structured JSON output
+//   API key: server-side proxy only (Cloudflare Worker / Supabase Edge Function)
 
 struct FeedMeView: View {
-    @Environment(AppState.self) private var appState
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -29,6 +20,7 @@ struct FeedMeView: View {
                         .frame(width: 100, height: 100)
                     Text("🤖")
                         .font(.system(size: 52))
+                        .accessibilityHidden(true)
                 }
 
                 VStack(spacing: 8) {
@@ -57,4 +49,8 @@ struct FeedMeView: View {
             }
         }
     }
+}
+
+#Preview {
+    FeedMeView()
 }

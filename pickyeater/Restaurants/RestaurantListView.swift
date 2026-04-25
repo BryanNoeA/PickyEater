@@ -1,39 +1,30 @@
 import SwiftUI
 import MapKit
-import CoreLocation
 
 struct RestaurantListView: View {
     let category: FoodCategory
-
-    @State private var locationManager = LocationManager()
-    @State private var restaurants: [MKMapItem] = []
-    @State private var isLoading = false
-    @State private var errorMessage: String? = nil
+    @State private var viewModel = RestaurantViewModel()
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            if isLoading {
+            if viewModel.isLoading {
                 loadingView
-            } else if let error = errorMessage {
+            } else if let error = viewModel.errorMessage {
                 errorView(error)
-            } else if restaurants.isEmpty {
+            } else if viewModel.restaurants.isEmpty {
                 emptyView
             } else {
                 restaurantList
             }
         }
         .onAppear {
-            locationManager.requestLocationIfNeeded()
+            viewModel.requestLocation()
         }
-        .onChange(of: locationManager.currentLocation) { _, location in
-            if let location {
-                Task { await loadRestaurants(near: location) }
-            }
+        .onChange(of: viewModel.currentLocation) { _, _ in
+            Task { await viewModel.search(for: category) }
         }
-        .onChange(of: locationManager.locationError) { _, error in
-            if let error {
-                errorMessage = error
-            }
+        .onChange(of: viewModel.locationError) { _, error in
+            if let error { viewModel.errorMessage = error }
         }
     }
 
@@ -67,27 +58,21 @@ struct RestaurantListView: View {
 
     private var restaurantList: some View {
         VStack(spacing: 0) {
-            ForEach(Array(restaurants.enumerated()), id: \.offset) { index, item in
-                if let location = locationManager.currentLocation {
+            ForEach(Array(viewModel.restaurants.enumerated()), id: \.offset) { index, item in
+                if let location = viewModel.currentLocation {
                     RestaurantRowView(mapItem: item, userLocation: location)
-                    if index < restaurants.count - 1 {
+                    if index < viewModel.restaurants.count - 1 {
                         Divider().padding(.leading, 56)
                     }
                 }
             }
         }
         .padding(.vertical, 4)
-        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 14))
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14))
     }
+}
 
-    private func loadRestaurants(near location: CLLocation) async {
-        isLoading = true
-        errorMessage = nil
-        do {
-            restaurants = try await RestaurantSearchService.search(for: category, near: location)
-        } catch {
-            errorMessage = "Couldn't load restaurants. Check your connection and try again."
-        }
-        isLoading = false
-    }
+#Preview {
+    RestaurantListView(category: .sushi)
+        .padding()
 }

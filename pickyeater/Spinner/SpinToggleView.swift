@@ -17,3 +17,8 @@ struct SpinToggleView: View {
         .padding(.horizontal, 32)
     }
 }
+
+#Preview {
+    SpinToggleView(spinMode: .constant(.wheel))
+        .padding()
+}
