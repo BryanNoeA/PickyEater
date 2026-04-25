@@ -1,0 +1,25 @@
+{
+  "identifier" : "com.bryanalmejo.pickyeater.storekit",
+  "nonConsumableProducts" : [
+    {
+      "displayPrice" : "2.99",
+      "familySharable" : true,
+      "internalID" : "com.bryanalmejo.pickyeater.premium",
+      "localizations" : [
+        {
+          "description" : "Find real nearby restaurants after every spin, with one-tap Apple Maps directions.",
+          "displayName" : "Picky Eater Premium",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "com.bryanalmejo.pickyeater.premium",
+      "referenceName" : "Picky Eater Premium",
+      "type" : "NonConsumable"
+    }
+  ],
+  "version" : {
+    "major" : 2,
+    "minor" : 0,
+    "patch" : 0
+  }
+}
