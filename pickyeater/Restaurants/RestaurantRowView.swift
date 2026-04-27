@@ -2,17 +2,16 @@ import SwiftUI
 import MapKit
 import CoreLocation
 
+/// A single row in the nearby-restaurants list.
+/// Tapping it opens the place in Apple Maps with directions pre-loaded.
 struct RestaurantRowView: View {
     let mapItem: MKMapItem
     let userLocation: CLLocation
 
     var body: some View {
-        Button {
-            mapItem.openInMaps(launchOptions: [
-                MKLaunchOptionsDirectionsModeKey: MKLaunchOptionsDirectionsModeDefault
-            ])
-        } label: {
+        Button(action: openInMaps) {
             HStack(spacing: 12) {
+                // Icon badge
                 ZStack {
                     Circle()
                         .fill(Color.accentColor.opacity(0.1))
@@ -22,12 +21,16 @@ struct RestaurantRowView: View {
                         .font(.system(size: 16))
                 }
 
+                // Restaurant name + street address
                 VStack(alignment: .leading, spacing: 2) {
                     Text(mapItem.name ?? "Restaurant")
                         .font(.system(size: 15, weight: .semibold))
                         .foregroundStyle(.primary)
                         .lineLimit(1)
-                    Text(addressLine)
+
+                    // addressLine is a computed property on MKMapItem (RestaurantSearchService.swift).
+                    // It returns street → city → state, whichever is available first.
+                    Text(mapItem.addressLine)
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
@@ -35,6 +38,7 @@ struct RestaurantRowView: View {
 
                 Spacer()
 
+                // Distance + external-link chevron
                 VStack(alignment: .trailing, spacing: 2) {
                     Text(mapItem.distanceString(from: userLocation))
                         .font(.caption)
@@ -44,6 +48,7 @@ struct RestaurantRowView: View {
                         .foregroundStyle(.tertiary)
                 }
             }
+            // Make the whole row tappable, not just the text
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -52,8 +57,14 @@ struct RestaurantRowView: View {
         .accessibilityHint("Opens directions in Maps")
     }
 
-    private var addressLine: String {
-        mapItem.placemark.thoroughfare ?? mapItem.placemark.locality ?? mapItem.placemark.administrativeArea ?? ""
+    // MARK: - Actions
+
+    private func openInMaps() {
+        // MKLaunchOptionsDirectionsModeDefault lets Maps pick driving, walking,
+        // or transit based on the user's last preference.
+        mapItem.openInMaps(launchOptions: [
+            MKLaunchOptionsDirectionsModeKey: MKLaunchOptionsDirectionsModeDefault
+        ])
     }
 }
 

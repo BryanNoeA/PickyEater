@@ -10,6 +10,7 @@ struct DiceView: View {
     @State private var scale: Double = 1.0
     @State private var isAnimating: Bool = false
     @State private var timerTask: Task<Void, Never>? = nil
+    @State private var hapticTrigger: Bool = false
 
     var body: some View {
         ZStack {
@@ -29,6 +30,7 @@ struct DiceView: View {
         .scaleEffect(scale)
         .rotation3DEffect(.degrees(rotationX), axis: (x: 1, y: 0, z: 0))
         .rotation3DEffect(.degrees(rotationY), axis: (x: 0, y: 1, z: 0))
+        .sensoryFeedback(.impact(weight: .medium), trigger: hapticTrigger)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("Food dice showing \(displayCategory.displayName)")
         .accessibilityHint("Roll to get a random food category")
@@ -66,7 +68,7 @@ struct DiceView: View {
                 scale = 1.0
             }
 
-            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+            hapticTrigger.toggle()
             isAnimating = false
             onResult(finalCategory)
         }

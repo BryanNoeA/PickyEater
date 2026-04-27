@@ -4,21 +4,65 @@ import SwiftData
 struct SpinnerView: View {
     @State private var viewModel = SpinnerViewModel()
     @AppStorage("spinMode") private var spinMode: SpinMode = .wheel
-    @Environment(StoreKitManager.self) private var storeKit
+    @Environment(StoreKitManager.self)  private var storeKit
+    @Environment(FilterSettings.self)   private var filterSettings
     @Environment(\.modelContext) private var modelContext
 
     var body: some View {
         ZStack {
-            LinearGradient(
-                colors: [Color(.systemBackground), Color(.secondarySystemBackground)],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
+            Color.peBackground.ignoresSafeArea()
 
-            VStack(spacing: 24) {
+            VStack(spacing: 0) {
+                // ── Custom toolbar ────────────────────────────────────────
+                HStack {
+                    HStack(spacing: 10) {
+                        ToolbarIconButton(
+                            systemImage: "slider.horizontal.3",
+                            label: "Filter",
+                            isActive: filterSettings.isActive,
+                            badge: filterSettings.isActive ? 1 : 0,
+                            action: openFilter
+                        )
+                        ToolbarIconButton(
+                            systemImage: "clock",
+                            label: "History",
+                            action: openHistory
+                        )
+                        ToolbarIconButton(
+                            systemImage: "fork.knife",
+                            label: "Feed Me",
+                            action: openFeedMe
+                        )
+                    }
+                    Spacer()
+                    ToolbarIconButton(
+                        systemImage: "gearshape",
+                        label: "Settings",
+                        action: openSettings
+                    )
+                }
+                .padding(.horizontal, 20)
+                .padding(.top, 8)
+
+                // ── Title ─────────────────────────────────────────────────
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Picky Eater")
+                        .font(.system(size: 36, weight: .bold, design: .serif))
+                        .foregroundStyle(Color(red: 0.102, green: 0.078, blue: 0.063))
+                    Text("What sounds good today?")
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundStyle(Color(red: 0.420, green: 0.361, blue: 0.322))
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 20)
+                .padding(.top, 24)
+                .padding(.bottom, 16)
+
+                // ── Mode toggle ───────────────────────────────────────────
                 SpinToggleView(spinMode: $spinMode)
+                    .padding(.horizontal, 20)
 
+                // ── Wheel / Dice ──────────────────────────────────────────
                 Group {
                     switch spinMode {
                     case .wheel:
@@ -33,45 +77,21 @@ struct SpinnerView: View {
                 }
                 .animation(.easeInOut(duration: 0.25), value: spinMode)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .padding(.vertical, 8)
 
-                spinButton
-                    .padding(.bottom, 8)
-            }
-            .padding(.top, 8)
-        }
-        .navigationTitle("Picky Eater")
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                Button {
-                    viewModel.showSettings = true
-                } label: {
-                    Image(systemName: "gear")
-                }
-                .accessibilityLabel("Settings")
-            }
-            ToolbarItem(placement: .topBarTrailing) {
-                HStack(spacing: 16) {
-                    Button {
-                        viewModel.showFeedMe = true
-                    } label: {
-                        Image(systemName: "fork.knife")
-                    }
-                    .accessibilityLabel("Feed Me")
-                    Button {
-                        viewModel.showHistory = true
-                    } label: {
-                        Image(systemName: "clock.arrow.circlepath")
-                    }
-                    .accessibilityLabel("History")
-                }
+                // ── CTA ───────────────────────────────────────────────────
+                SpinButton(isSpinning: viewModel.isSpinning, onTap: spin)
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 16)
             }
         }
-        .sheet(isPresented: Bindable(viewModel).showResult) {
-            if let result = viewModel.lastResult {
-                ResultView(category: result, showPaywall: Bindable(viewModel).showPaywall)
-                    .environment(storeKit)
-            }
+        // Hide the navigation bar — title lives inline in the content
+        .toolbarVisibility(.hidden, for: .navigationBar)
+        .sensoryFeedback(.impact(flexibility: .rigid, intensity: 1.0), trigger: viewModel.isSpinning) { _, new in new }
+        .sensoryFeedback(.impact(weight: .light), trigger: viewModel.lastResult) { old, new in new != nil && old != new }
+        .sheet(item: Bindable(viewModel).lastResult) { result in
+            ResultView(category: result, showPaywall: Bindable(viewModel).showPaywall)
+                .environment(storeKit)
         }
         .sheet(isPresented: Bindable(viewModel).showPaywall) {
             PaywallView()
@@ -87,37 +107,26 @@ struct SpinnerView: View {
         .sheet(isPresented: Bindable(viewModel).showFeedMe) {
             FeedMeView()
         }
+        .sheet(isPresented: Bindable(viewModel).showFilter) {
+            FilterView()
+                .environment(filterSettings)
+        }
     }
 
-    private var spinButton: some View {
-        Button {
-            viewModel.startSpin()
-        } label: {
-            HStack(spacing: 10) {
-                Image(systemName: spinMode == .wheel ? "arrow.trianglehead.2.clockwise" : "dice.fill")
-                    .font(.system(size: 18, weight: .bold))
-                Text(spinMode == .wheel ? "Spin!" : "Roll!")
-                    .font(.system(size: 20, weight: .bold))
-            }
-            .foregroundStyle(.white)
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 18)
-            .background(
-                viewModel.isSpinning ? Color.gray : Color.accentColor,
-                in: RoundedRectangle(cornerRadius: 18)
-            )
-            .padding(.horizontal, 32)
-        }
-        .disabled(viewModel.isSpinning)
-        .animation(.easeInOut(duration: 0.2), value: viewModel.isSpinning)
-        .accessibilityLabel(spinMode == .wheel ? "Spin the wheel" : "Roll the dice")
-    }
+    // MARK: - Actions
+
+    private func spin()         { viewModel.startSpin() }
+    private func openFilter()   { viewModel.showFilter   = true }
+    private func openHistory()  { viewModel.showHistory  = true }
+    private func openFeedMe()   { viewModel.showFeedMe   = true }
+    private func openSettings() { viewModel.showSettings = true }
 }
 
 #Preview {
     NavigationStack {
         SpinnerView()
             .environment(StoreKitManager())
+            .environment(FilterSettings())
     }
     .modelContainer(for: SpinResult.self, inMemory: true)
 }

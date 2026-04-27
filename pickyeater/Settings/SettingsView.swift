@@ -2,14 +2,18 @@ import SwiftUI
 
 struct SettingsView: View {
     @Binding var showPaywall: Bool
-    @Environment(StoreKitManager.self) private var storeKit
+    @Environment(StoreKitManager.self)  private var storeKit
+    @Environment(AuthManager.self)      private var authManager
+    @Environment(ProfileManager.self)   private var profileManager
     @Environment(\.dismiss) private var dismiss
 
-    @State private var isRestoring = false
+    @State private var showAuth     = false
+    @State private var isRestoring  = false
 
     var body: some View {
         NavigationStack {
             List {
+                accountSection
                 premiumSection
                 legalSection
                 aboutSection
@@ -19,50 +23,71 @@ struct SettingsView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") { dismiss() }
+                    Button("Done", action: done)
                         .fontWeight(.semibold)
+                }
+            }
+        }
+        // Sign-in sheet — for non-premium users who tap "Sign In"
+        .sheet(isPresented: $showAuth) {
+            AuthView()
+        }
+    }
+
+    // MARK: - Account section
+
+    private var accountSection: some View {
+        Section("Account") {
+            if authManager.isSignedIn {
+                // Signed in: show email + link to AccountView
+                NavigationLink {
+                    AccountView()
+                } label: {
+                    Label(authManager.currentUserEmail ?? "My Account", systemImage: "person.circle.fill")
+                }
+            } else {
+                // Not signed in: prompt to sign in (required to access premium)
+                Button(action: openAuth) {
+                    Label("Sign In / Create Account", systemImage: "person.circle")
+                        .foregroundStyle(Color.accentColor)
                 }
             }
         }
     }
 
+    // MARK: - Premium section
+
     private var premiumSection: some View {
-        Section("Subscription") {
+        Section("Premium") {
+            // Show premium status based on Supabase profile (with offline cache fallback)
             HStack {
-                Label("Premium Status", systemImage: "star.fill")
-                    .foregroundStyle(storeKit.isPurchased ? .yellow : .primary)
+                Label("Status", systemImage: "star.fill")
+                    .foregroundStyle(profileManager.isPremium ? .yellow : .primary)
                 Spacer()
-                Text(storeKit.isPurchased ? "Unlocked ✓" : "Free")
+                Text(profileManager.isPremium ? "Unlocked ✓" : "Free")
                     .font(.subheadline)
-                    .foregroundStyle(storeKit.isPurchased ? .yellow : .secondary)
+                    .foregroundStyle(profileManager.isPremium ? .yellow : .secondary)
             }
 
-            if !storeKit.isPurchased {
-                Button("Unlock Premium") {
-                    dismiss()
-                    showPaywall = true
+            if !profileManager.isPremium {
+                // Upgrade button — requires sign-in, so redirect if not signed in
+                Button(action: openUpgradeFlow) {
+                    Text("Unlock Premium")
+                        .foregroundStyle(Color.accentColor)
                 }
-                .foregroundStyle(Color.accentColor)
 
-                Button {
-                    Task {
-                        isRestoring = true
-                        await storeKit.restorePurchases()
-                        isRestoring = false
-                    }
-                } label: {
+                Button(action: restorePurchase) {
                     HStack {
                         Text("Restore Purchase")
-                        if isRestoring {
-                            Spacer()
-                            ProgressView()
-                        }
+                        if isRestoring { Spacer(); ProgressView() }
                     }
                 }
                 .disabled(isRestoring)
             }
         }
     }
+
+    // MARK: - Legal section
 
     private var legalSection: some View {
         Section {
@@ -77,6 +102,8 @@ struct SettingsView: View {
         }
     }
 
+    // MARK: - About section
+
     private var aboutSection: some View {
         Section("About") {
             HStack {
@@ -87,9 +114,38 @@ struct SettingsView: View {
             }
         }
     }
+
+    // MARK: - Actions
+
+    private func done()           { dismiss() }
+    private func openAuth()       { showAuth = true }
+
+    private func openUpgradeFlow() {
+        // If not signed in, show auth first — they need an account to purchase
+        if authManager.isSignedIn {
+            dismiss()
+            showPaywall = true
+        } else {
+            showAuth = true
+        }
+    }
+
+    private func restorePurchase() {
+        Task {
+            isRestoring = true
+            await storeKit.restorePurchases()
+            // If StoreKit confirms a purchase, sync it to their Supabase profile
+            if storeKit.isPurchased, let userID = authManager.currentUserID {
+                await profileManager.setPremium(true, userID: userID)
+            }
+            isRestoring = false
+        }
+    }
 }
 
 #Preview {
     SettingsView(showPaywall: .constant(false))
         .environment(StoreKitManager())
+        .environment(AuthManager())
+        .environment(ProfileManager())
 }
