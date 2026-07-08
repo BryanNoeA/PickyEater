@@ -74,7 +74,7 @@ struct SettingsView: View {
 
                     // ── Legal card ────────────────────────────────────────
                     settingsCard(header: "Legal") {
-                        Link(destination: URL(string: "https://example.com/privacy")!) {
+                        Link(destination: URL(string: "https://bryannoea.github.io/PickyEater/privacy.html")!) {
                             HStack {
                                 Label("Privacy Policy", systemImage: "hand.raised.fill")
                                     .foregroundStyle(.primary)
