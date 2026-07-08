@@ -60,6 +60,7 @@ struct SpinnerView: View {
 
                 // ── Mode toggle ───────────────────────────────────────────
                 SpinToggleView(spinMode: $spinMode)
+                    .disabled(viewModel.isSpinning)
                     .padding(.horizontal, 20)
 
                 // ── Wheel / Dice ──────────────────────────────────────────

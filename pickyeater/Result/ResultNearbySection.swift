@@ -4,19 +4,16 @@ struct ResultNearbySection: View {
     let category: FoodCategory
     let onUpgrade: () -> Void
 
-    // Premium status comes from ProfileManager (Supabase, account-tied)
-    // rather than StoreKitManager (device-only). This means premium follows
-    // the user across all their devices when signed in.
-    @Environment(ProfileManager.self) private var profileManager
+    @Environment(StoreKitManager.self) private var storeKit
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Image(systemName: "mappin.and.ellipse")
-                    .foregroundStyle(profileManager.isPremium ? Color.accentColor : .secondary)
+                    .foregroundStyle(storeKit.isPurchased ? Color.accentColor : .secondary)
                 Text("Nearby \(category.displayName)")
                     .font(.headline)
-                if !profileManager.isPremium {
+                if !storeKit.isPurchased {
                     Spacer()
                     Image(systemName: "lock.fill")
                         .font(.caption)
@@ -25,7 +22,7 @@ struct ResultNearbySection: View {
             }
             .padding(.horizontal, 20)
 
-            if profileManager.isPremium {
+            if storeKit.isPurchased {
                 // Premium user: show the real restaurant list from MapKit
                 RestaurantListView(category: category)
                     .padding(.horizontal, 20)
@@ -61,5 +58,5 @@ struct ResultNearbySection: View {
 
 #Preview {
     ResultNearbySection(category: .sushi, onUpgrade: {})
-        .environment(ProfileManager())
+        .environment(StoreKitManager())
 }

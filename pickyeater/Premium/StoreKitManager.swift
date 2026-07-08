@@ -29,8 +29,9 @@ final class StoreKitManager {
         isPurchased = false
     }
 
-    func purchase() async {
-        guard let product else { return }
+    @discardableResult
+    func purchase() async -> PurchaseState {
+        guard let product else { return .failed }
         do {
             let result = try await product.purchase()
             switch result {
@@ -38,14 +39,20 @@ final class StoreKitManager {
                 if case .verified(let transaction) = verification {
                     await transaction.finish()
                     isPurchased = true
+                    return .success
                 }
-            case .userCancelled, .pending:
-                break
+                return .failed
+            case .userCancelled:
+                return .cancelled
+            case .pending:
+                // Ask-to-buy / SCA: not a failure. The transaction listener
+                // flips isPurchased once the pending purchase clears.
+                return .pending
             @unknown default:
-                break
+                return .failed
             }
         } catch {
-            // Failure surfaced via isPurchased remaining false
+            return .failed
         }
     }
 
@@ -60,12 +67,13 @@ final class StoreKitManager {
 
     func startTransactionListener() {
         transactionListenerTask?.cancel()
-        transactionListenerTask = Task {
+        transactionListenerTask = Task { [weak self] in
             for await result in Transaction.updates {
+                guard let self else { continue }
                 if case .verified(let transaction) = result {
                     await transaction.finish()
                     if transaction.productID == StoreKitManager.premiumProductID {
-                        isPurchased = transaction.revocationDate == nil
+                        self.isPurchased = transaction.revocationDate == nil
                     }
                 }
             }

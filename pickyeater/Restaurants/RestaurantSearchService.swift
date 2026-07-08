@@ -36,32 +36,20 @@ extension MKMapItem {
     /// Straight-line distance from the user's location, formatted as miles.
     /// Shows "< 0.1 mi" for anything under a tenth of a mile.
     func distanceString(from location: CLLocation) -> String {
-        // MKMapItem.placemark is deprecated in iOS 26; use the new .location
-        // property (a CLLocation) to get the coordinate without a warning.
-        let coord: CLLocationCoordinate2D
-        if #available(iOS 26, *) {
-            coord = self.location.coordinate
-        } else {
-            coord = placemark.coordinate
-        }
-
-        let meters = location.distance(from: CLLocation(latitude: coord.latitude, longitude: coord.longitude))
+        // Deployment target is iOS 26+, so `.location` (the non-deprecated
+        // replacement for `.placemark.coordinate`) is always available.
+        let meters = location.distance(from: self.location)
         let miles  = meters / 1609.344
         return miles < 0.1 ? "< 0.1 mi" : String(format: "%.1f mi", miles)
     }
 
     /// Short street address for display in a list row.
-    /// Returns the street name if available, then city, then state.
-    ///
-    /// ⚠️ `MKMapItem.placemark` is deprecated in iOS 26, but Apple has not yet
-    /// documented a replacement for reading address components from `MKLocalSearch`
-    /// results. All access is consolidated here so it can be updated in one place
-    /// once a proper replacement API is available.
+    /// Returns the short address (typically street name) if available,
+    /// then falls back to city, then state.
     var addressLine: String {
-        let pm = placemark  // single deprecated-property access — see note above
-        return pm.thoroughfare          // street name, e.g. "Market St"
-            ?? pm.locality             // city, e.g. "San Francisco"
-            ?? pm.administrativeArea   // state, e.g. "CA"
+        address?.shortAddress
+            ?? addressRepresentations?.cityName          // city, e.g. "San Francisco"
+            ?? addressRepresentations?.regionName         // state/region, e.g. "California"
             ?? ""
     }
 }

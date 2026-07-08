@@ -69,7 +69,7 @@ struct RestaurantRowView: View {
 }
 
 #Preview {
-    let item = MKMapItem(placemark: MKPlacemark(coordinate: .init(latitude: 37.7749, longitude: -122.4194)))
+    let item = MKMapItem(location: CLLocation(latitude: 37.7749, longitude: -122.4194), address: nil)
     item.name = "Nobu San Francisco"
     return RestaurantRowView(
         mapItem: item,

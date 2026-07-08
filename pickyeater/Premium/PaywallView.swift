@@ -4,13 +4,7 @@ import StoreKit
 struct PaywallView: View {
     @State private var viewModel = PaywallViewModel()
     @Environment(StoreKitManager.self)  private var storeKit
-    @Environment(AuthManager.self)      private var authManager
-    @Environment(ProfileManager.self)   private var profileManager
     @Environment(\.dismiss) private var dismiss
-
-    /// Controls the AuthView sheet. When the user taps "Create Account to Unlock",
-    /// this becomes true and the sign-in flow slides up.
-    @State private var showAuth = false
 
     var body: some View {
         NavigationStack {
@@ -19,8 +13,15 @@ struct PaywallView: View {
                     PaywallHeroSection()
                     PaywallFeatureList()
 
-                    // Error from a failed purchase attempt
-                    if let error = viewModel.errorMessage {
+                    // Ask-to-buy / SCA approval pending — informational, not an error
+                    if viewModel.isPending, let message = viewModel.errorMessage {
+                        Label(message, systemImage: "clock.fill")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, 20)
+                    } else if let error = viewModel.errorMessage {
+                        // Error from a failed purchase attempt
                         Text(error)
                             .font(.caption)
                             .foregroundStyle(.red)
@@ -28,19 +29,13 @@ struct PaywallView: View {
                             .padding(.horizontal, 20)
                     }
 
-                    // If the user is signed in, show the purchase button.
-                    // If not, show the account-creation gate instead.
-                    if authManager.isSignedIn {
-                        PaywallCTASection(
-                            isPurchasing: viewModel.isPurchasing,
-                            isRestoring:  viewModel.isRestoring,
-                            product:      storeKit.product,
-                            onPurchase:   purchase,
-                            onRestore:    restore
-                        )
-                    } else {
-                        PaywallAuthGate(onSignIn: showAuthSheet)
-                    }
+                    PaywallCTASection(
+                        isPurchasing: viewModel.isPurchasing,
+                        isRestoring:  viewModel.isRestoring,
+                        product:      storeKit.product,
+                        onPurchase:   purchase,
+                        onRestore:    restore
+                    )
                 }
             }
             .navigationTitle("Go Premium")
@@ -52,13 +47,9 @@ struct PaywallView: View {
                 }
             }
         }
-        // Dismiss paywall once purchase is confirmed and isPremium updates
-        .onChange(of: profileManager.isPremium) { _, isPremium in
-            if isPremium { dismiss() }
-        }
-        // Sign-in sheet — presented when user taps the auth gate
-        .sheet(isPresented: $showAuth) {
-            AuthView()
+        // Dismiss paywall once purchase is confirmed
+        .onChange(of: storeKit.isPurchased) { _, isPurchased in
+            if isPurchased { dismiss() }
         }
     }
 
@@ -66,31 +57,20 @@ struct PaywallView: View {
 
     private func purchase() {
         Task {
-            await viewModel.purchase(
-                storeKit: storeKit,
-                profileManager: profileManager,
-                userID: authManager.currentUserID
-            )
+            await viewModel.purchase(storeKit: storeKit)
         }
     }
 
     private func restore() {
         Task {
-            await viewModel.restore(
-                storeKit: storeKit,
-                profileManager: profileManager,
-                userID: authManager.currentUserID
-            )
+            await viewModel.restore(storeKit: storeKit)
         }
     }
 
-    private func close()         { dismiss() }
-    private func showAuthSheet() { showAuth = true }
+    private func close() { dismiss() }
 }
 
 #Preview {
     PaywallView()
         .environment(StoreKitManager())
-        .environment(AuthManager())
-        .environment(ProfileManager())
 }

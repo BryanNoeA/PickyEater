@@ -107,7 +107,7 @@ struct HistoryView: View {
     // MARK: - Actions
 
     private func clearAll() {
-        results.forEach { modelContext.delete($0) }
+        try? modelContext.delete(model: SpinResult.self)
     }
 }
 

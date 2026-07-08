@@ -37,6 +37,9 @@ struct DiceView: View {
         .onChange(of: isSpinning) { _, spinning in
             if spinning && !isAnimating { roll() }
         }
+        .onDisappear {
+            timerTask?.cancel()
+        }
     }
 
     private func roll() {

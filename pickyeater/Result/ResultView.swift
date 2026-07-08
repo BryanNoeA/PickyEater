@@ -60,7 +60,6 @@ struct ResultView: View {
         .sheet(isPresented: .constant(true)) {
             ResultView(category: .sushi, showPaywall: .constant(false))
                 .environment(StoreKitManager())
-                .environment(ProfileManager())
                 .environment(FilterSettings())
         }
 }

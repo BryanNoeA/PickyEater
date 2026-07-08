@@ -1,0 +1,17 @@
+# macOS
+.DS_Store
+
+# Xcode
+build/
+DerivedData/
+*.xcuserstate
+*.xcuserdatad/
+xcuserdata/
+*.moved-aside
+
+# Claude Code local worktrees (prevents iCloud-synced worktree corruption)
+.claude/worktrees/
+
+# Swift Package Manager
+.swiftpm/
+.build/

@@ -78,3 +78,16 @@ enum FoodCategory: String, CaseIterable, Codable, Identifiable {
         }
     }
 }
+
+extension FoodCategory {
+    /// The category under the top pointer after the wheel has rotated `rotationDegrees`.
+    /// Wedge i is drawn spanning [sliceAngle*i - 90, sliceAngle*(i+1) - 90); the pointer sits at 12 o'clock.
+    static func category(forRotation rotationDegrees: Double) -> FoodCategory {
+        let count = allCases.count
+        let slice = 360.0 / Double(count)
+        let normalized = (rotationDegrees.truncatingRemainder(dividingBy: 360) + 360).truncatingRemainder(dividingBy: 360)
+        let adjusted = ((360 - normalized).truncatingRemainder(dividingBy: 360) + 360).truncatingRemainder(dividingBy: 360)
+        let index = Int(adjusted / slice) % count
+        return allCases[index]
+    }
+}

@@ -8,14 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		E9154F142F9D7B76003FE50E /* CLAUDE.md in Resources */ = {isa = PBXBuildFile; fileRef = E9154F132F9D7B76003FE50E /* CLAUDE.md */; };
-		E9EC4E082F9E9A5400195CC3 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = E9EC4E072F9E9A5400195CC3 /* GoogleSignIn */; };
-		E9EC4E0A2F9E9A5400195CC3 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = E9EC4E092F9E9A5400195CC3 /* GoogleSignInSwift */; };
-		E9EC4E0E2F9E9B1C00195CC3 /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = E9EC4E0D2F9E9B1C00195CC3 /* Auth */; };
-		E9EC4E102F9E9B1C00195CC3 /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = E9EC4E0F2F9E9B1C00195CC3 /* Functions */; };
-		E9EC4E122F9E9B1C00195CC3 /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = E9EC4E112F9E9B1C00195CC3 /* PostgREST */; };
-		E9EC4E142F9E9B1C00195CC3 /* Realtime in Frameworks */ = {isa = PBXBuildFile; productRef = E9EC4E132F9E9B1C00195CC3 /* Realtime */; };
-		E9EC4E162F9E9B1C00195CC3 /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = E9EC4E152F9E9B1C00195CC3 /* Storage */; };
-		E9EC4E182F9E9B1C00195CC3 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = E9EC4E172F9E9B1C00195CC3 /* Supabase */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -49,14 +41,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E9EC4E082F9E9A5400195CC3 /* GoogleSignIn in Frameworks */,
-				E9EC4E0A2F9E9A5400195CC3 /* GoogleSignInSwift in Frameworks */,
-				E9EC4E162F9E9B1C00195CC3 /* Storage in Frameworks */,
-				E9EC4E102F9E9B1C00195CC3 /* Functions in Frameworks */,
-				E9EC4E182F9E9B1C00195CC3 /* Supabase in Frameworks */,
-				E9EC4E142F9E9B1C00195CC3 /* Realtime in Frameworks */,
-				E9EC4E0E2F9E9B1C00195CC3 /* Auth in Frameworks */,
-				E9EC4E122F9E9B1C00195CC3 /* PostgREST in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -108,14 +92,6 @@
 			);
 			name = pickyeater;
 			packageProductDependencies = (
-				E9EC4E072F9E9A5400195CC3 /* GoogleSignIn */,
-				E9EC4E092F9E9A5400195CC3 /* GoogleSignInSwift */,
-				E9EC4E0D2F9E9B1C00195CC3 /* Auth */,
-				E9EC4E0F2F9E9B1C00195CC3 /* Functions */,
-				E9EC4E112F9E9B1C00195CC3 /* PostgREST */,
-				E9EC4E132F9E9B1C00195CC3 /* Realtime */,
-				E9EC4E152F9E9B1C00195CC3 /* Storage */,
-				E9EC4E172F9E9B1C00195CC3 /* Supabase */,
 			);
 			productName = pickyeater;
 			productReference = E9154F022F9D731F003FE50E /* pickyeater.app */;
@@ -146,8 +122,6 @@
 			mainGroup = E9154EF92F9D731F003FE50E;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				E9EC4E062F9E9A5400195CC3 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
-				E9EC4E0B2F9E9ACD00195CC3 /* XCRemoteSwiftPackageReference "supabase-swift" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = E9154F032F9D731F003FE50E /* Products */;
@@ -395,67 +369,6 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCRemoteSwiftPackageReference section */
-		E9EC4E062F9E9A5400195CC3 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 9.1.0;
-			};
-		};
-		E9EC4E0B2F9E9ACD00195CC3 /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/supabase/supabase-swift";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.5.1;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		E9EC4E072F9E9A5400195CC3 /* GoogleSignIn */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = E9EC4E062F9E9A5400195CC3 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
-			productName = GoogleSignIn;
-		};
-		E9EC4E092F9E9A5400195CC3 /* GoogleSignInSwift */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = E9EC4E062F9E9A5400195CC3 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
-			productName = GoogleSignInSwift;
-		};
-		E9EC4E0D2F9E9B1C00195CC3 /* Auth */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = E9EC4E0B2F9E9ACD00195CC3 /* XCRemoteSwiftPackageReference "supabase-swift" */;
-			productName = Auth;
-		};
-		E9EC4E0F2F9E9B1C00195CC3 /* Functions */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = E9EC4E0B2F9E9ACD00195CC3 /* XCRemoteSwiftPackageReference "supabase-swift" */;
-			productName = Functions;
-		};
-		E9EC4E112F9E9B1C00195CC3 /* PostgREST */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = E9EC4E0B2F9E9ACD00195CC3 /* XCRemoteSwiftPackageReference "supabase-swift" */;
-			productName = PostgREST;
-		};
-		E9EC4E132F9E9B1C00195CC3 /* Realtime */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = E9EC4E0B2F9E9ACD00195CC3 /* XCRemoteSwiftPackageReference "supabase-swift" */;
-			productName = Realtime;
-		};
-		E9EC4E152F9E9B1C00195CC3 /* Storage */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = E9EC4E0B2F9E9ACD00195CC3 /* XCRemoteSwiftPackageReference "supabase-swift" */;
-			productName = Storage;
-		};
-		E9EC4E172F9E9B1C00195CC3 /* Supabase */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = E9EC4E0B2F9E9ACD00195CC3 /* XCRemoteSwiftPackageReference "supabase-swift" */;
-			productName = Supabase;
-		};
-/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = E9154EFA2F9D731F003FE50E /* Project object */;
 }

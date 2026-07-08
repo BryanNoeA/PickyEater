@@ -49,15 +49,21 @@ final class RestaurantViewModel {
         errorMessage = nil
 
         do {
-            restaurants = try await RestaurantSearchService.search(
+            let results = try await RestaurantSearchService.search(
                 for: category,
                 near: location,
                 radiusMeters: radiusMeters
             )
+            // The caller's .task(id:) cancels this Task when location/radius
+            // changes again before the search returns — don't let a stale,
+            // slow-finishing search overwrite a fresher one's results.
+            guard !Task.isCancelled else { return }
+            restaurants = results
+            isLoading = false
         } catch {
+            guard !Task.isCancelled else { return }
             errorMessage = "Couldn't load restaurants. Check your connection and try again."
+            isLoading = false
         }
-
-        isLoading = false
     }
 }

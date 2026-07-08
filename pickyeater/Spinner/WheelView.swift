@@ -108,15 +108,12 @@ struct WheelView: View {
             // Wait for the animation to fully settle before reading the result.
             try? await Task.sleep(for: .seconds(spinDuration + 0.1))
 
-            // The pointer sits at 12 o'clock (270° in standard math coords,
-            // but we offset by -90° in the canvas draw, so 0° in our system).
-            // Work out which slice index is under the pointer after the spin.
-            let normalized = rotationDegrees.truncatingRemainder(dividingBy: 360)
-            let adjusted   = (360 - normalized + sliceAngle / 2).truncatingRemainder(dividingBy: 360)
-            let index      = Int(adjusted / sliceAngle) % categories.count
+            // The pointer sits at 12 o'clock. Landing math lives in
+            // FoodCategory.category(forRotation:) so it's unit-testable.
+            let result = FoodCategory.category(forRotation: rotationDegrees)
 
             isAnimating = false
-            onResult(categories[max(0, min(index, categories.count - 1))])
+            onResult(result)
         }
     }
 

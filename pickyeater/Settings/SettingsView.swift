@@ -3,149 +3,156 @@ import SwiftUI
 struct SettingsView: View {
     @Binding var showPaywall: Bool
     @Environment(StoreKitManager.self)  private var storeKit
-    @Environment(AuthManager.self)      private var authManager
-    @Environment(ProfileManager.self)   private var profileManager
     @Environment(\.dismiss) private var dismiss
 
-    @State private var showAuth     = false
     @State private var isRestoring  = false
 
     var body: some View {
         NavigationStack {
-            List {
-                accountSection
-                premiumSection
-                legalSection
-                aboutSection
-            }
-            .listStyle(.insetGrouped)
-            .navigationTitle("Settings")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done", action: done)
-                        .fontWeight(.semibold)
-                }
-            }
-        }
-        // Sign-in sheet — for non-premium users who tap "Sign In"
-        .sheet(isPresented: $showAuth) {
-            AuthView()
-        }
-    }
+            ScrollView {
+                VStack(spacing: 24) {
+                    // ── Top row: drag handle + Done ───────────────────────
+                    ZStack {
+                        Capsule()
+                            .fill(Color(.tertiaryLabel))
+                            .frame(width: 36, height: 5)
+                            .frame(maxWidth: .infinity)
 
-    // MARK: - Account section
-
-    private var accountSection: some View {
-        Section("Account") {
-            if authManager.isSignedIn {
-                // Signed in: show email + link to AccountView
-                NavigationLink {
-                    AccountView()
-                } label: {
-                    Label(authManager.currentUserEmail ?? "My Account", systemImage: "person.circle.fill")
-                }
-            } else {
-                // Not signed in: prompt to sign in (required to access premium)
-                Button(action: openAuth) {
-                    Label("Sign In / Create Account", systemImage: "person.circle")
-                        .foregroundStyle(Color.accentColor)
-                }
-            }
-        }
-    }
-
-    // MARK: - Premium section
-
-    private var premiumSection: some View {
-        Section("Premium") {
-            // Show premium status based on Supabase profile (with offline cache fallback)
-            HStack {
-                Label("Status", systemImage: "star.fill")
-                    .foregroundStyle(profileManager.isPremium ? .yellow : .primary)
-                Spacer()
-                Text(profileManager.isPremium ? "Unlocked ✓" : "Free")
-                    .font(.subheadline)
-                    .foregroundStyle(profileManager.isPremium ? .yellow : .secondary)
-            }
-
-            if !profileManager.isPremium {
-                // Upgrade button — requires sign-in, so redirect if not signed in
-                Button(action: openUpgradeFlow) {
-                    Text("Unlock Premium")
-                        .foregroundStyle(Color.accentColor)
-                }
-
-                Button(action: restorePurchase) {
-                    HStack {
-                        Text("Restore Purchase")
-                        if isRestoring { Spacer(); ProgressView() }
+                        HStack {
+                            Spacer()
+                            Button("Done") { dismiss() }
+                                .font(.system(size: 16, weight: .semibold))
+                                .foregroundStyle(Color.accentColor)
+                        }
+                        .padding(.horizontal, 20)
                     }
+                    .padding(.top, 12)
+
+                    // ── Title ─────────────────────────────────────────────
+                    Text("Settings")
+                        .font(.system(size: 28, weight: .bold, design: .serif))
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, 20)
+
+                    // ── Premium card ──────────────────────────────────────
+                    settingsCard(header: "Premium") {
+                        HStack {
+                            Label("Status", systemImage: "star.fill")
+                                .foregroundStyle(storeKit.isPurchased
+                                    ? Color(red: 1, green: 0.8, blue: 0.2) : .primary)
+                            Spacer()
+                            Text(storeKit.isPurchased ? "Unlocked ✓" : "Free")
+                                .font(.subheadline)
+                                .foregroundStyle(storeKit.isPurchased
+                                    ? Color(red: 1, green: 0.8, blue: 0.2) : .secondary)
+                        }
+
+                        if !storeKit.isPurchased {
+                            Divider()
+
+                            Button(action: openUpgradeFlow) {
+                                HStack {
+                                    Text("Unlock Premium")
+                                        .foregroundStyle(Color.accentColor)
+                                    Spacer()
+                                }
+                            }
+
+                            Divider()
+
+                            Button(action: restorePurchase) {
+                                HStack {
+                                    Text("Restore Purchase")
+                                        .foregroundStyle(.primary)
+                                    Spacer()
+                                    if isRestoring { ProgressView() }
+                                }
+                            }
+                            .disabled(isRestoring)
+                        }
+                    }
+
+                    // ── Legal card ────────────────────────────────────────
+                    settingsCard(header: "Legal") {
+                        Link(destination: URL(string: "https://example.com/privacy")!) {
+                            HStack {
+                                Label("Privacy Policy", systemImage: "hand.raised.fill")
+                                    .foregroundStyle(.primary)
+                                Spacer()
+                                Image(systemName: "arrow.up.right")
+                                    .font(.caption)
+                                    .foregroundStyle(.tertiary)
+                            }
+                        }
+                    }
+
+                    // ── About card ────────────────────────────────────────
+                    settingsCard(header: "About") {
+                        HStack {
+                            Text("Version")
+                            Spacer()
+                            Text(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0")
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+
+                    Spacer(minLength: 20)
                 }
-                .disabled(isRestoring)
+                .padding(.top, 8)
             }
+            .background(Color.peBackground)
+            .toolbarVisibility(.hidden, for: .navigationBar)
         }
+        .presentationBackground(Color.peBackground)
+        .presentationDragIndicator(.hidden)
+        .presentationCornerRadius(28)
     }
 
-    // MARK: - Legal section
+    // MARK: - Card builder
 
-    private var legalSection: some View {
-        Section {
-            Link(destination: URL(string: "https://example.com/privacy")!) {
-                Label("Privacy Policy", systemImage: "hand.raised.fill")
-            }
-        } header: {
-            Text("Legal")
-        } footer: {
-            Text("Replace the privacy policy URL before submitting to the App Store.")
+    @ViewBuilder
+    private func settingsCard<Content: View>(
+        header: String,
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(header.uppercased())
                 .font(.caption)
-        }
-    }
+                .fontWeight(.semibold)
+                .foregroundStyle(.secondary)
+                .padding(.horizontal, 4)
 
-    // MARK: - About section
-
-    private var aboutSection: some View {
-        Section("About") {
-            HStack {
-                Text("Version")
-                Spacer()
-                Text(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0")
-                    .foregroundStyle(.secondary)
+            VStack(spacing: 0) {
+                content()
+                    .font(.system(size: 15))
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 13)
             }
+            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
         }
+        .padding(.horizontal, 20)
     }
 
     // MARK: - Actions
 
-    private func done()           { dismiss() }
-    private func openAuth()       { showAuth = true }
-
     private func openUpgradeFlow() {
-        // If not signed in, show auth first — they need an account to purchase
-        if authManager.isSignedIn {
-            dismiss()
-            showPaywall = true
-        } else {
-            showAuth = true
-        }
+        dismiss()
+        showPaywall = true
     }
 
     private func restorePurchase() {
         Task {
             isRestoring = true
             await storeKit.restorePurchases()
-            // If StoreKit confirms a purchase, sync it to their Supabase profile
-            if storeKit.isPurchased, let userID = authManager.currentUserID {
-                await profileManager.setPremium(true, userID: userID)
-            }
             isRestoring = false
         }
     }
 }
 
 #Preview {
-    SettingsView(showPaywall: .constant(false))
-        .environment(StoreKitManager())
-        .environment(AuthManager())
-        .environment(ProfileManager())
+    Color.peBackground.ignoresSafeArea()
+        .sheet(isPresented: .constant(true)) {
+            SettingsView(showPaywall: .constant(false))
+                .environment(StoreKitManager())
+        }
 }
