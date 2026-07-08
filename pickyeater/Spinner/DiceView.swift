@@ -22,9 +22,12 @@ struct DiceView: View {
                 Text(displayCategory.emoji)
                     .font(.system(size: 72))
                 Text(displayCategory.displayName)
-                    .font(.system(size: 22, weight: .bold))
+                    .font(.title3.weight(.bold))
                     .foregroundStyle(.white)
+                    .minimumScaleFactor(0.8)
+                    .lineLimit(1)
             }
+            .padding(.horizontal, 12)
         }
         .frame(width: 220, height: 220)
         .scaleEffect(scale)

@@ -10,23 +10,11 @@ struct ResultView: View {
         ScrollView {
             VStack(spacing: 28) {
                 // ── Top row: drag handle + Spin Again ────────────────────
-                ZStack {
-                    // Drag handle centred
-                    Capsule()
-                        .fill(Color(.tertiaryLabel))
-                        .frame(width: 36, height: 5)
-                        .frame(maxWidth: .infinity)
-
-                    // Spin Again pinned to the right
-                    HStack {
-                        Spacer()
-                        Button("Spin Again", action: spinAgain)
-                            .font(.system(size: 16, weight: .semibold))
-                            .foregroundStyle(Color.accentColor)
-                    }
-                    .padding(.horizontal, 20)
+                SheetTopBar {
+                    Button("Spin Again", action: spinAgain)
+                        .font(.headline)
+                        .foregroundStyle(Color.accentColor)
                 }
-                .padding(.top, 12)
 
                 // ── Hero card ─────────────────────────────────────────────
                 ResultHeroCard(category: category)

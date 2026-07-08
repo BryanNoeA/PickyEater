@@ -31,7 +31,7 @@ struct ToolbarIconButton: View {
                 .overlay(alignment: .topTrailing) {
                     if badge > 0 {
                         Text("\(badge)")
-                            .font(.system(size: 11, weight: .bold))
+                            .font(.caption2.weight(.bold))
                             .foregroundStyle(.white)
                             .frame(minWidth: 18, minHeight: 18)
                             .padding(.horizontal, 4)
@@ -39,6 +39,8 @@ struct ToolbarIconButton: View {
                             .offset(x: 4, y: -4)
                     }
                 }
+                .frame(width: 44, height: 44)
+                .contentShape(Circle())
         }
         .accessibilityLabel(label)
     }

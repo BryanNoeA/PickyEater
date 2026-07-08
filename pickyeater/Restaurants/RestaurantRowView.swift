@@ -18,20 +18,21 @@ struct RestaurantRowView: View {
                         .frame(width: 44, height: 44)
                     Image(systemName: "fork.knife")
                         .foregroundStyle(Color.accentColor)
-                        .font(.system(size: 16))
+                        .font(.body)
                 }
 
                 // Restaurant name + street address
                 VStack(alignment: .leading, spacing: 2) {
                     Text(mapItem.name ?? "Restaurant")
-                        .font(.system(size: 15, weight: .semibold))
+                        .font(.headline)
                         .foregroundStyle(.primary)
                         .lineLimit(1)
+                        .minimumScaleFactor(0.8)
 
                     // addressLine is a computed property on MKMapItem (RestaurantSearchService.swift).
                     // It returns street → city → state, whichever is available first.
                     Text(mapItem.addressLine)
-                        .font(.caption)
+                        .font(.footnote)
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
                 }
@@ -41,7 +42,7 @@ struct RestaurantRowView: View {
                 // Distance + external-link chevron
                 VStack(alignment: .trailing, spacing: 2) {
                     Text(mapItem.distanceString(from: userLocation))
-                        .font(.caption)
+                        .font(.footnote)
                         .foregroundStyle(.secondary)
                     Image(systemName: "arrow.up.right")
                         .font(.caption2)

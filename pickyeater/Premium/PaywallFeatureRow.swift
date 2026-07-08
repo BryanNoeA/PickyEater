@@ -17,7 +17,7 @@ struct PaywallFeatureRow: View {
                     .font(.system(size: 18))
             }
             VStack(alignment: .leading, spacing: 2) {
-                Text(title).font(.system(size: 15, weight: .semibold))
+                Text(title).font(.subheadline.weight(.semibold))
                 Text(description).font(.subheadline).foregroundStyle(.secondary)
             }
         }

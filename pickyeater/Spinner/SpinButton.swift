@@ -10,8 +10,10 @@ struct SpinButton: View {
     var body: some View {
         Button(action: onTap) {
             Text("Pick for me")
-                .font(.system(size: 17, weight: .semibold))
+                .font(.headline)
                 .foregroundStyle(.white)
+                .minimumScaleFactor(0.8)
+                .lineLimit(1)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 17)
                 .background(

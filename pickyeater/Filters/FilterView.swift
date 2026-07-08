@@ -10,32 +10,22 @@ struct FilterView: View {
         ScrollView {
             VStack(spacing: 24) {
                 // ── Top row: drag handle + Done ───────────────────────────
-                ZStack {
-                    Capsule()
-                        .fill(Color(.tertiaryLabel))
-                        .frame(width: 36, height: 5)
-                        .frame(maxWidth: .infinity)
-
-                    HStack {
-                        Spacer()
-                        Button("Done") { dismiss() }
-                            .font(.system(size: 16, weight: .semibold))
-                            .foregroundStyle(Color.accentColor)
-                    }
-                    .padding(.horizontal, 20)
+                SheetTopBar {
+                    Button("Done") { dismiss() }
+                        .font(.body.weight(.semibold))
+                        .foregroundStyle(Color.accentColor)
                 }
-                .padding(.top, 12)
 
                 // ── Title ─────────────────────────────────────────────────
                 Text("Filters")
-                    .font(.system(size: 28, weight: .bold, design: .serif))
+                    .font(.system(.title, design: .serif).weight(.bold))
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal, 20)
 
                 // ── Open Now card ─────────────────────────────────────────
                 VStack(alignment: .leading, spacing: 0) {
                     Toggle("Open Now", isOn: Bindable(filters).openNow)
-                        .font(.system(size: 15, weight: .semibold))
+                        .font(.headline)
                         .padding(16)
 
                     Divider()
@@ -55,7 +45,7 @@ struct FilterView: View {
                 VStack(alignment: .leading, spacing: 12) {
                     HStack {
                         Text("Search Radius")
-                            .font(.system(size: 15, weight: .semibold))
+                            .font(.headline)
                         Spacer()
                         Text("\(Int(filters.radiusMiles)) mi")
                             .foregroundStyle(Color.accentColor)
@@ -83,7 +73,7 @@ struct FilterView: View {
                 // ── Reset ─────────────────────────────────────────────────
                 if filters.isActive {
                     Button("Reset to Defaults", role: .destructive, action: reset)
-                        .font(.system(size: 15, weight: .semibold))
+                        .font(.subheadline.weight(.semibold))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 14)
                         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14))

@@ -12,25 +12,15 @@ struct SettingsView: View {
             ScrollView {
                 VStack(spacing: 24) {
                     // ── Top row: drag handle + Done ───────────────────────
-                    ZStack {
-                        Capsule()
-                            .fill(Color(.tertiaryLabel))
-                            .frame(width: 36, height: 5)
-                            .frame(maxWidth: .infinity)
-
-                        HStack {
-                            Spacer()
-                            Button("Done") { dismiss() }
-                                .font(.system(size: 16, weight: .semibold))
-                                .foregroundStyle(Color.accentColor)
-                        }
-                        .padding(.horizontal, 20)
+                    SheetTopBar {
+                        Button("Done") { dismiss() }
+                            .font(.body.weight(.semibold))
+                            .foregroundStyle(Color.accentColor)
                     }
-                    .padding(.top, 12)
 
                     // ── Title ─────────────────────────────────────────────
                     Text("Settings")
-                        .font(.system(size: 28, weight: .bold, design: .serif))
+                        .font(.system(.title, design: .serif).weight(.bold))
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, 20)
 
@@ -41,10 +31,15 @@ struct SettingsView: View {
                                 .foregroundStyle(storeKit.isPurchased
                                     ? Color(red: 1, green: 0.8, blue: 0.2) : .primary)
                             Spacer()
-                            Text(storeKit.isPurchased ? "Unlocked ✓" : "Free")
-                                .font(.subheadline)
-                                .foregroundStyle(storeKit.isPurchased
-                                    ? Color(red: 1, green: 0.8, blue: 0.2) : .secondary)
+                            if storeKit.isPurchased {
+                                Label("Unlocked", systemImage: "checkmark.circle.fill")
+                                    .font(.subheadline)
+                                    .foregroundStyle(Color(red: 1, green: 0.8, blue: 0.2))
+                            } else {
+                                Text("Free")
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                            }
                         }
 
                         if !storeKit.isPurchased {
@@ -124,7 +119,7 @@ struct SettingsView: View {
 
             VStack(spacing: 0) {
                 content()
-                    .font(.system(size: 15))
+                    .font(.body)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 13)
             }

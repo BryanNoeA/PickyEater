@@ -47,11 +47,11 @@ struct SpinnerView: View {
                 // ── Title ─────────────────────────────────────────────────
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Picky Eater")
-                        .font(.system(size: 36, weight: .bold, design: .serif))
-                        .foregroundStyle(Color(red: 0.102, green: 0.078, blue: 0.063))
+                        .font(.system(.largeTitle, design: .serif).weight(.bold))
+                        .foregroundStyle(Color.peTextPrimary)
                     Text("What sounds good today?")
-                        .font(.system(size: 15, weight: .medium))
-                        .foregroundStyle(Color(red: 0.420, green: 0.361, blue: 0.322))
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(Color.peTextSecondary)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 20)

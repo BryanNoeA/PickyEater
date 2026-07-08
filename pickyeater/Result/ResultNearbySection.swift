@@ -32,10 +32,10 @@ struct ResultNearbySection: View {
                     HStack {
                         VStack(alignment: .leading, spacing: 4) {
                             Text("Find real nearby restaurants")
-                                .font(.system(size: 15, weight: .semibold))
+                                .font(.headline)
                                 .foregroundStyle(.primary)
                             Text("Unlock Picky Eater Premium")
-                                .font(.caption)
+                                .font(.footnote)
                                 .foregroundStyle(.secondary)
                         }
                         Spacer()

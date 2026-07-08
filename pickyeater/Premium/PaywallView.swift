@@ -32,6 +32,7 @@ struct PaywallView: View {
                     PaywallCTASection(
                         isPurchasing: viewModel.isPurchasing,
                         isRestoring:  viewModel.isRestoring,
+                        isPending:    viewModel.isPending,
                         product:      storeKit.product,
                         onPurchase:   purchase,
                         onRestore:    restore

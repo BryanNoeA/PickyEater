@@ -27,15 +27,17 @@ struct SpinToggleView: View {
         } label: {
             HStack(spacing: 6) {
                 Text(mode == .wheel ? "✦" : "⚀")
-                    .font(.system(size: 13))
+                    .font(.caption)
                 Text(mode == .wheel ? "Spin Wheel" : "Dice")
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(.subheadline.weight(.semibold))
             }
             .foregroundStyle(
                 isActive
                     ? Color.persimmonDark
-                    : Color(red: 0.541, green: 0.482, blue: 0.416)
+                    : Color.peTextSecondary
             )
+            .minimumScaleFactor(0.8)
+            .lineLimit(1)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 9)
             .background(

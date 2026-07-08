@@ -32,7 +32,11 @@ struct RestaurantListView: View {
             if viewModel.isLoading || (viewModel.currentLocation == nil && displayedError == nil) {
                 RestaurantLoadingView(categoryName: category.displayName)
             } else if let error = displayedError {
-                RestaurantErrorView(message: error)
+                RestaurantErrorView(
+                    message: error,
+                    showsOpenSettings: viewModel.authorizationStatus == .denied
+                        || viewModel.authorizationStatus == .restricted
+                )
             } else if viewModel.restaurants.isEmpty {
                 RestaurantEmptyView(categoryName: category.displayName)
             } else if let location = viewModel.currentLocation {

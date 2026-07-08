@@ -7,14 +7,15 @@ struct PaywallHeroSection: View {
                 Circle()
                     .fill(Color.accentColor.opacity(0.12))
                     .frame(width: 110, height: 110)
-                Text("📍")
-                    .font(.system(size: 52))
+                Image(systemName: "mappin.and.ellipse")
+                    .font(.system(size: 44))
+                    .foregroundStyle(Color.accentColor)
                     .accessibilityHidden(true)
             }
             .padding(.top, 32)
 
             Text("Picky Eater Premium")
-                .font(.system(size: 28, weight: .black))
+                .font(.system(.title, design: .serif).weight(.bold))
 
             Text("Find real restaurants near you after every spin.")
                 .font(.subheadline)

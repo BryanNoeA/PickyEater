@@ -14,8 +14,10 @@ struct ResultHeroCard: View {
                 .foregroundStyle(.secondary)
 
             Text(category.displayName)
-                .font(.system(size: 36, weight: .black))
+                .font(.system(.title, design: .serif).weight(.bold))
                 .foregroundStyle(.primary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 32)

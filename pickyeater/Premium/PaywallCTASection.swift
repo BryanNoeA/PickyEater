@@ -4,6 +4,7 @@ import StoreKit
 struct PaywallCTASection: View {
     let isPurchasing: Bool
     let isRestoring: Bool
+    let isPending: Bool
     let product: Product?
     let onPurchase: () -> Void
     let onRestore: () -> Void
@@ -12,11 +13,14 @@ struct PaywallCTASection: View {
         VStack(spacing: 12) {
             Button(action: onPurchase) {
                 Group {
-                    if isPurchasing {
+                    if isPending {
+                        Label("Waiting for approval", systemImage: "clock.fill")
+                            .font(.headline)
+                    } else if isPurchasing {
                         ProgressView().tint(.white)
                     } else {
                         Text(product.map { "Unlock for \($0.displayPrice)" } ?? "Unlock Premium")
-                            .font(.system(size: 18, weight: .bold))
+                            .font(.headline)
                     }
                 }
                 .foregroundStyle(.white)
@@ -24,8 +28,8 @@ struct PaywallCTASection: View {
                 .padding(.vertical, 18)
                 .background(Color.accentColor, in: RoundedRectangle(cornerRadius: 16))
             }
-            .disabled(isPurchasing || isRestoring)
-            .accessibilityLabel(product.map { "Unlock Premium for \($0.displayPrice)" } ?? "Unlock Premium")
+            .disabled(isPurchasing || isRestoring || isPending)
+            .accessibilityLabel(isPending ? "Waiting for approval" : (product.map { "Unlock Premium for \($0.displayPrice)" } ?? "Unlock Premium"))
 
             Button(action: onRestore) {
                 Group {
@@ -33,12 +37,12 @@ struct PaywallCTASection: View {
                         ProgressView()
                     } else {
                         Text("Restore Purchase")
-                            .font(.system(size: 15))
+                            .font(.subheadline)
                             .foregroundStyle(.secondary)
                     }
                 }
             }
-            .disabled(isPurchasing || isRestoring)
+            .disabled(isPurchasing || isRestoring || isPending)
 
             Text("One-time purchase · No subscription · No expiry")
                 .font(.caption2)
@@ -53,6 +57,7 @@ struct PaywallCTASection: View {
     PaywallCTASection(
         isPurchasing: false,
         isRestoring: false,
+        isPending: false,
         product: nil,
         onPurchase: {},
         onRestore: {}

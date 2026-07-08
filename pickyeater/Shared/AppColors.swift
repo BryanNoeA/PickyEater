@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 /// Brand color tokens for Picky Eater.
 ///
@@ -27,6 +28,20 @@ extension Color {
 
     /// Persimmon 700 — #B8350D. Dark foreground on persimmon-soft backgrounds.
     static let persimmonDark = Color(red: 0.722, green: 0.208, blue: 0.051)
+
+    // MARK: - Adaptive text
+
+    /// Primary title text — dark warm brown (light) / warm off-white (dark).
+    static let peTextPrimary = Color(uiColor: UIColor { $0.userInterfaceStyle == .dark
+        ? UIColor(red: 0.96, green: 0.94, blue: 0.90, alpha: 1)
+        : UIColor(red: 0.102, green: 0.078, blue: 0.063, alpha: 1)
+    })
+
+    /// Secondary/subtitle text — muted warm gray, adapts for dark mode contrast.
+    static let peTextSecondary = Color(uiColor: UIColor { $0.userInterfaceStyle == .dark
+        ? UIColor(red: 0.70, green: 0.66, blue: 0.60, alpha: 1)
+        : UIColor(red: 0.420, green: 0.361, blue: 0.322, alpha: 1)
+    })
 
     // MARK: - Wheel wedge palette (12 soft pastels, design system)
     // Mapped in the same order as FoodCategory.allCases.
