@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Full-width "Pick for me" CTA — persimmon pill with glow shadow.
+/// Full-width "Pick for me" CTA — persimmon Liquid Glass pill.
 ///
 /// Grays out while the wheel or dice is animating to prevent double-taps.
 struct SpinButton: View {
@@ -16,17 +16,9 @@ struct SpinButton: View {
                 .lineLimit(1)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 17)
-                .background(
-                    isSpinning ? Color.gray.opacity(0.5) : Color.accentColor,
-                    in: Capsule()
-                )
-                .shadow(
-                    color: isSpinning
-                        ? .clear
-                        : Color.persimmon.opacity(0.35),
-                    radius: 12, y: 6
-                )
         }
+        .buttonStyle(.glassProminent)
+        .tint(isSpinning ? Color.gray.opacity(0.5) : Color.persimmon)
         .disabled(isSpinning)
         .animation(.easeInOut(duration: 0.2), value: isSpinning)
         .accessibilityLabel("Pick a food category for me")

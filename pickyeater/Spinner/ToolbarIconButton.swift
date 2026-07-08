@@ -1,10 +1,10 @@
 import SwiftUI
 
-/// Circular bordered icon button used in SpinnerView's custom toolbar.
+/// Circular Liquid Glass icon button used in SpinnerView's custom toolbar.
 ///
-/// Matches the design system: 38 pt circle, material background,
-/// warm hairline border, subtle shadow. Pass `isActive` to tint the
-/// icon in persimmon when a feature is turned on (e.g. filter badge).
+/// Matches the design system: 38 pt circle, native `.glassEffect`.
+/// Pass `isActive` to tint the glass in persimmon when a feature is
+/// turned on (e.g. filter badge).
 struct ToolbarIconButton: View {
     let systemImage: String
     let label: String
@@ -18,15 +18,10 @@ struct ToolbarIconButton: View {
                 .font(.system(size: 15, weight: .medium))
                 .foregroundStyle(isActive ? Color.accentColor : Color.primary)
                 .frame(width: 38, height: 38)
-                .background(.regularMaterial, in: Circle())
-                .overlay {
-                    Circle()
-                        .stroke(
-                            Color(red: 0.925, green: 0.882, blue: 0.824),
-                            lineWidth: 0.5
-                        )
-                }
-                .shadow(color: .black.opacity(0.05), radius: 2, y: 1)
+                .glassEffect(
+                    isActive ? .regular.tint(Color.persimmonSoft) : .regular,
+                    in: Circle()
+                )
                 // Badge — shown when filters are active
                 .overlay(alignment: .topTrailing) {
                     if badge > 0 {

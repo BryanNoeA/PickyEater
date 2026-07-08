@@ -14,32 +14,34 @@ struct SpinnerView: View {
 
             VStack(spacing: 0) {
                 // ── Custom toolbar ────────────────────────────────────────
-                HStack {
-                    HStack(spacing: 10) {
+                GlassEffectContainer {
+                    HStack {
+                        HStack(spacing: 10) {
+                            ToolbarIconButton(
+                                systemImage: "slider.horizontal.3",
+                                label: "Filter",
+                                isActive: filterSettings.isActive,
+                                badge: filterSettings.isActive ? 1 : 0,
+                                action: openFilter
+                            )
+                            ToolbarIconButton(
+                                systemImage: "clock",
+                                label: "History",
+                                action: openHistory
+                            )
+                            ToolbarIconButton(
+                                systemImage: "fork.knife",
+                                label: "Feed Me",
+                                action: openFeedMe
+                            )
+                        }
+                        Spacer()
                         ToolbarIconButton(
-                            systemImage: "slider.horizontal.3",
-                            label: "Filter",
-                            isActive: filterSettings.isActive,
-                            badge: filterSettings.isActive ? 1 : 0,
-                            action: openFilter
-                        )
-                        ToolbarIconButton(
-                            systemImage: "clock",
-                            label: "History",
-                            action: openHistory
-                        )
-                        ToolbarIconButton(
-                            systemImage: "fork.knife",
-                            label: "Feed Me",
-                            action: openFeedMe
+                            systemImage: "gearshape",
+                            label: "Settings",
+                            action: openSettings
                         )
                     }
-                    Spacer()
-                    ToolbarIconButton(
-                        systemImage: "gearshape",
-                        label: "Settings",
-                        action: openSettings
-                    )
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 8)
